@@ -14,6 +14,7 @@ router.get("/products", async (req, res) => {
 
 router.get("/price/:user_id/:product_name", async (req, res) => {
   try {
+    // Get product
     const product = await productModel.findOne({
       name: req.params.product_name.toLowerCase(),
     });
@@ -22,12 +23,14 @@ router.get("/price/:user_id/:product_name", async (req, res) => {
       return;
     }
 
+    // Get user
     const user = await userModel.findOne({ id: req.params.user_id });
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
 
+    // If user has special offer for product brand returns price for user
     const index = user.specialPrices?.findIndex(
       (offer) => offer.brand === product.brand
     );
@@ -38,6 +41,7 @@ router.get("/price/:user_id/:product_name", async (req, res) => {
       return;
     }
 
+    // If user has no special offer for product brand returns base price
     res.json(product.price);
   } catch (error) {
     res.status(500).json({ message: error.message });
